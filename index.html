@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f8e9eb">
+<title>Workoutog — Your personal fitness journal</title>
+<style>
+:root{
+ --bg:#fff9f7; --paper:#ffffff; --ink:#382d31; --muted:#88777d; --pink:#e7a9b7;
+ --pink-dark:#bd7186; --blush:#f8e7eb; --line:#f0dfe3; --sage:#dce8dc; --shadow:0 8px 24px rgba(94,54,66,.08);
+}
+[data-theme="neutral"]{--bg:#f7f6f2;--paper:#fffefa;--ink:#30312e;--muted:#777970;--pink:#c7c8bb;--pink-dark:#777d6c;--blush:#ecece4;--line:#e4e3da;--sage:#dfe8dd}
+[data-theme="dark"]{--bg:#201b20;--paper:#2c252c;--ink:#f8edf0;--muted:#c3adb5;--pink:#c98da0;--pink-dark:#edb4c4;--blush:#49343f;--line:#4b3b44;--sage:#3d4a40;--shadow:0 8px 24px rgba(0,0,0,.18)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-rounded,"Avenir Next",Avenir,system-ui,-apple-system,sans-serif;transition:background .2s,color .2s}
+button,select,input{font:inherit}
+button{cursor:pointer}
+.app{max-width:1120px;margin:0 auto;padding:20px 16px 36px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:44px;height:44px;border-radius:15px;background:var(--blush);display:grid;place-items:center;font-size:24px}
+h1{font-size:21px;letter-spacing:-.7px;margin:0}
+.tagline{font-size:12px;color:var(--muted);margin-top:3px}
+.top-actions{display:flex;gap:8px;align-items:center}
+select,.ghost,.pill{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:12px;padding:9px 11px;font-size:12px}
+.hero{background:linear-gradient(125deg,var(--blush),var(--paper));border:1px solid var(--line);border-radius:24px;padding:22px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.eyebrow{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pink-dark);font-weight:800}
+.hero h2{font-size:clamp(23px,4vw,34px);letter-spacing:-1.1px;margin:7px 0 8px;line-height:1.08}
+.hero p{margin:0;color:var(--muted);font-size:13px;max-width:500px;line-height:1.5}
+.hero-badge{min-width:86px;height:86px;border-radius:50%;background:var(--paper);border:1px solid var(--line);display:grid;place-items:center;font-size:34px;box-shadow:var(--shadow)}
+.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:start}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow);min-width:0}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+.card h3{font-size:16px;margin:0;letter-spacing:-.3px}
+.monthnav{display:flex;align-items:center;gap:8px}
+.monthnav button{width:30px;height:30px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.monthlabel{font-size:13px;font-weight:700;min-width:104px;text-align:center}
+.weekdays,.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.weekdays span{text-align:center;font-size:10px;color:var(--muted);padding:6px 0}
+.day{min-height:54px;border:1px solid transparent;background:var(--bg);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--ink);position:relative;padding:4px 0}
+.day .num{font-size:12px;font-weight:650}
+.day .dot{width:5px;height:5px;border-radius:50%;background:transparent}
+.day.workout .dot{background:var(--pink-dark)}
+.day.rest .dot{background:var(--sage)}
+.day.selected{border-color:var(--pink-dark);background:var(--blush)}
+.day.today .num{width:23px;height:23px;display:grid;place-items:center;background:var(--paper);border-radius:50%;border:1px solid var(--pink)}
+.day.done:after{content:"✓";position:absolute;top:2px;right:5px;font-size:9px;color:var(--pink-dark);font-weight:900}
+.legend{display:flex;gap:13px;flex-wrap:wrap;color:var(--muted);font-size:10px;margin-top:12px}
+.legend span{display:flex;align-items:center;gap:5px}.key{width:7px;height:7px;border-radius:50%;display:inline-block}.key.pink{background:var(--pink-dark)}.key.green{background:#9bb69e}
+.day-summary{margin-top:16px;padding:14px;border-radius:16px;background:var(--bg);border:1px solid var(--line)}
+.summary-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.summary-top h4{font-size:15px;margin:3px 0 5px}.summary-top p{margin:0;color:var(--muted);font-size:12px}
+.status{font-size:10px;background:var(--blush);color:var(--pink-dark);padding:6px 8px;border-radius:9px;font-weight:800;white-space:nowrap}
+.primary{border:0;border-radius:13px;background:var(--pink-dark);color:white;font-weight:750;padding:12px 15px;font-size:12px}
+.secondary{border:1px solid var(--line);border-radius:13px;background:var(--paper);color:var(--ink);padding:11px 13px;font-size:12px;font-weight:700}
+.day-actions{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}
+.day-actions button{flex:1}
+.workout-list{display:flex;flex-direction:column;gap:10px}
+.exercise{border:1px solid var(--line);border-radius:17px;overflow:hidden}
+.exercise-main{display:flex;align-items:center;gap:11px;padding:12px}
+.ex-icon{width:52px;height:52px;flex-shrink:0;background:var(--blush);border-radius:14px;display:grid;place-items:center;font-size:23px}
+.ex-info{flex:1;min-width:0}
+.ex-info strong{font-size:13px;display:block}
+.ex-info small{font-size:11px;color:var(--muted);display:block;margin-top:4px;line-height:1.35}
+.exercise-main .open-demo{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px;font-size:11px}
+.demo{padding:12px;background:var(--bg);border-top:1px solid var(--line);display:none}
+.demo.open{display:block}
+.demo-layout{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center}
+.animation{height:112px;border-radius:14px;background:var(--paper);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.animation svg{width:110px;height:100px;overflow:visible}
+.demo h5{margin:0 0 5px;font-size:12px}.demo p{font-size:11px;color:var(--muted);line-height:1.45;margin:0}
+.demo .tip{margin-top:7px;color:var(--ink);font-size:10px}
+.exercise-check{width:22px;height:22px;accent-color:var(--pink-dark)}
+.section-label{font-size:10px;color:var(--pink-dark);letter-spacing:1.4px;text-transform:uppercase;font-weight:850;margin:18px 0 9px}
+.section-label:first-child{margin-top:0}
+.completion{margin-top:13px;padding:13px;border-radius:15px;background:var(--blush);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.completion p{margin:0;font-size:12px}.completion small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.progress{height:5px;background:var(--paper);border-radius:10px;overflow:hidden;margin-top:8px}.progress span{display:block;height:100%;width:0;background:var(--pink-dark);transition:width .2s}
+.notes{margin-top:18px;font-size:11px;line-height:1.55;color:var(--muted)}
+.notes strong{color:var(--ink)}
+.modal-backdrop{position:fixed;inset:0;background:#1d141b66;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}
+.modal-backdrop.show{display:flex}.modal{width:min(420px,100%);background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:20px}
+.modal h3{margin:0 0 8px}.modal p{font-size:12px;color:var(--muted);line-height:1.5}
+.modal label{font-size:12px;display:block;margin:12px 0 6px}.modal input,.modal select{width:100%;padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+.modal-actions{display:flex;gap:8px;margin-top:16px}.modal-actions button{flex:1}
+.empty{padding:20px;text-align:center;color:var(--muted);font-size:12px}
+.footer{text-align:center;font-size:10px;color:var(--muted);margin:22px 0 0}
+@media(max-width:760px){.app{padding:14px 12px 28px}header{margin-bottom:16px}.grid{grid-template-columns:1fr}.hero{padding:18px}.hero-badge{min-width:66px;height:66px;font-size:27px}.card{padding:14px}.day{min-height:47px}.monthlabel{min-width:95px}.top-actions select{max-width:105px}}
+@media(max-width:360px){.day{min-height:41px}.day .num{font-size:11px}.demo-layout{grid-template-columns:100px 1fr}.animation{height:100px}.animation svg{width:95px}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<header>
+ <div class="brand"><div class="logo">🌷</div><div><h1>workoutog</h1><div class="tagline">your personal fitness journal</div></div></div>
+ <div class="top-actions"><select id="themeSelect" aria-label="Choose theme"><option value="pink">Blush</option><option value="neutral">Neutral</option><option value="dark">Midnight</option></select></div>
+</header>
+<section class="hero">
+ <div><div class="eyebrow">small steps, stronger you</div><h2>Your routine,<br>your rhythm.</h2><p>A gentle, structured home-training plan built around glutes, hip stability, quads and recovery.</p></div>
+ <div class="hero-badge">♡</div>
+</section>
+<div class="grid">
+ <section class="card">
+  <div class="card-head"><h3>Your calendar</h3><div class="monthnav"><button id="prevMonth" aria-label="Previous month">‹</button><div class="monthlabel" id="monthLabel"></div><button id="nextMonth" aria-label="Next month">›</button></div></div>
+  <div class="weekdays"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div>
+  <div class="calendar" id="calendar"></div>
+  <div class="legend"><span><i class="key pink"></i> Workout</span><span><i class="key green"></i> Rest / optional</span><span>✓ Completed</span></div>
+  <div class="day-summary" id="daySummary"></div>
+  <div class="notes"><strong>Coach's note:</strong> This is your Week 0 foundation. Keep movements comfortable and controlled. Hip dips are partly influenced by anatomy; training can strengthen surrounding muscles but can't guarantee they disappear.</div>
+ </section>
+ <section class="card">
+  <div class="card-head"><h3 id="workoutTitle">Today's plan</h3><span class="status" id="workoutTag">WEEK 0</span></div>
+  <div id="workoutContent"></div>
+ </section>
+</div>
+<div class="footer">Made for your real life — consistency over perfection ✿</div>
+</div>
+<div class="modal-backdrop" id="rescheduleModal">
+ <div class="modal"><h3>Move this session</h3><p>Choose another date. Your original date won't be marked as completed.</p><label for="newDate">New date</label><input id="newDate" type="date"><div class="modal-actions"><button class="secondary" id="cancelMove">Cancel</button><button class="primary" id="confirmMove">Reschedule</button></div></div>
+</div>
+<script>
+const plan = {
+ 0:{name:"Glute Medius + Hip Dips",type:"workout",focus:"Side-glute control & core",sections:[
+  {name:"Pre-warm-up",items:[["Right glute squeeze","1 × 10","Lightly squeeze the right glute for 2–3 seconds, then relax.","Keep your pelvis still; this is a coordination check, not a diagnosis.","🍑","standing"],["Right mini kickbacks","1 × 8","On all fours, move the right heel back a small distance and return slowly.","Skip if kneeling bothers your knee. Do not arch your back.","↗","quadruped"]]},
+  {name:"Warm-up",items:[["Cat-cow","6 reps","On hands and knees, gently round and arch your back with your breath.","Move through a comfortable range; don't force your neck.","🐈","quadruped"],["Standing hip circles","8 each side","Stand tall and draw small circles with one knee lifted.","Hold a wall for balance if needed.","◌","standing"],["Standing side leg raises","10 each side","Stand tall and lift one leg out to the side, then lower with control.","Keep toes facing forward and avoid leaning your torso.","↔","standing"]]},
+  {name:"Workout",items:[["Side-lying leg raises","2 × 12 / side","Lie on your side and raise the top leg, then lower slowly.","Keep hips stacked; use a smaller range if your hip rolls backward.","↗","side"],["Banded clamshells","2 × 12 / side","Lie on your side with knees bent; open the top knee while feet stay together.","Don't roll your pelvis backward. Band is optional.","◒","side"],["Fire hydrants","2 × 10 / side","On all fours, lift one bent knee out to the side and lower slowly.","Keep the spine quiet; stop before your pelvis twists.","↗","quadruped"],["Dead bugs","2 × 6 / side","Lie on your back and slowly extend opposite arm and leg, then switch.","Keep your lower back gently steady; shorten the reach if it arches.","✳","supine"]]},
+  {name:"Cooldown",items:[["Figure-four stretch","25 sec / side","Lie on your back, cross ankle over opposite thigh and draw legs toward you.","A comfortable alternative to pigeon pose if kneeling is uncomfortable.","⌁","supine"],["Slow breathing","5 slow breaths","Lie comfortably and breathe slowly into your lower ribs.","Let your shoulders and jaw relax.","○","supine"]]}
+ ]},
+ 1:{name:"Quads + Glutes",type:"workout",focus:"Leg strength & hip support",sections:[
+  {name:"Pre-warm-up",items:[["Right glute squeeze","1 × 10","Lightly squeeze the right glute for 2–3 seconds, then relax.","This is optional coordination practice; do equal training sets on both sides.","🍑","standing"],["Right mini kickbacks","1 × 8","On all fours, move the right heel back a small distance and return slowly.","Skip if kneeling bothers your knee.","↗","quadruped"],["Glute bridge hold","1 × 15 sec","Lie on your back, feet flat, and gently lift hips into a bridge.","Keep ribs down and don't over-arch your back.","⌒","supine"]]},
+  {name:"Warm-up",items:[["Easy march","30 sec","March in place at a comfortable pace.","Keep it gentle; this isn't a cardio test.","⇅","standing"],["Shallow squats","8 reps","Sit hips back a little, bend knees comfortably, then stand.","Use a pain-free depth; knees can travel forward and should track your toes.","⌄","standing"],["Standing knee raises","8 each side","Lift one knee toward hip height or lower, then switch.","Stand tall and hold support if needed.","↑","standing"]]},
+  {name:"Workout",items:[["Bodyweight squats","2 × 10","Lower into a comfortable squat, then stand with control.","Stop or reduce depth if knee pain appears; don't force range.","⌄","standing"],["Reverse lunges","2 × 6 / side","Step one foot back, bend both knees as comfortable, then return.","Use a short step or hold a wall for balance. Swap for sit-to-stands if painful.","↙","standing"],["Seated knee extensions","2 × 12 / side","Sit upright and straighten one knee, pause, then lower slowly.","Use a stable chair. If uncomfortable, skip and tell your coach; don't push through pain.","↗","seated"],["Glute bridges","2 × 12","Lie on your back and lift hips until shoulders, hips and knees align.","Push through the whole foot; avoid flaring ribs or arching your back.","⌒","supine"]]},
+  {name:"Cooldown",items:[["Standing quad stretch","25 sec / side","Hold an ankle behind you and gently bring heel toward your seat.","Keep knees close and hold a wall; use a side-lying version if balance is hard.","↗","standing"],["Hip-flexor stretch","25 sec / side","Take a split stance, gently tuck pelvis and shift forward slightly.","You should feel the front of the back hip, not pinching in the low back.","→","standing"],["Child's pose","30 sec","Sit hips toward heels and reach arms forward as comfortable.","Skip or widen knees if this position is uncomfortable.","⌁","quadruped"]]}
+ ]},
+ 2:{name:"Light Recovery + Core",type:"workout",focus:"Control, mobility & recovery",sections:[
+  {name:"Pre-warm-up",items:[["Right glute squeeze","1 × 8","Gently squeeze the right glute for 2 seconds, then relax.","Optional coordination practice; skip if it causes discomfort.","🍑","standing"],["Right mini kickbacks","1 × 6","Make a small, controlled kickback on all fours.","Skip if the supporting knee is uncomfortable.","↗","quadruped"]]},
+  {name:"Warm-up",items:[["Cat-cow","6 reps","Gently round and arch your back with your breath.","Keep movement comfortable and slow.","🐈","quadruped"],["Pelvic tilts","10 reps","Lie on your back and gently tilt pelvis to flatten the low back, then release.","Small movement; don't push hard.","↔","supine"],["Standing hip circles","6 each side","Draw small circles with one knee lifted.","Hold a wall for balance if useful.","◌","standing"]]},
+  {name:"Workout",items:[["Bird dogs","2 × 6 / side","On all fours, reach opposite arm and leg long, then return and switch.","Keep hips level; start with just one limb if balance is difficult.","✳","quadruped"],["Dead bugs","2 × 6 / side","On your back, slowly lower opposite arm and leg, then switch.","Shorten the reach if your lower back arches.","✳","supine"],["Side-lying leg raises","1 × 10 / side","Lie on your side and lift the top leg with hips stacked.","Smooth reps, no swinging.","↗","side"],["Glute bridges","1 × 12","Lift hips gently, pause, and lower with control.","Keep this session easy; stop well before exhaustion.","⌒","supine"]]},
+  {name:"Cooldown",items:[["Figure-four stretch","25 sec / side","Cross ankle over opposite thigh while lying on your back and draw legs in.","Keep head and shoulders relaxed.","⌁","supine"],["Child's pose","30 sec","Sit back toward heels and reach forward comfortably.","Skip if knees don't like the position.","⌁","quadruped"]]}
+ ]},
+ 4:{name:"Glute Max + Side Glutes",type:"workout",focus:"Glute strength & shape",sections:[
+  {name:"Pre-warm-up",items:[["Right glute squeeze","1 × 10","Lightly squeeze the right glute for 2–3 seconds, then relax.","Optional coordination practice, not a diagnosis of weakness.","🍑","standing"],["Right mini kickbacks","1 × 8","On all fours, move the right heel back a small distance and return slowly.","Skip if kneeling bothers your knee.","↗","quadruped"],["Glute bridge hold","1 × 15 sec","Lift hips gently and hold without arching your back.","Keep the movement pain-free.","⌒","supine"]]},
+  {name:"Warm-up",items:[["Easy march","30 sec","March gently in place.","Stay at an easy pace.","⇅","standing"],["Standing hip circles","8 each side","Draw small circles with a lifted knee.","Hold a wall if needed.","◌","standing"],["Easy glute bridges","8 reps","Lift and lower hips gently to rehearse the movement.","No need to squeeze as hard as possible.","⌒","supine"]]},
+  {name:"Workout",items:[["Glute bridges","3 × 12","Lie on your back, feet flat, and lift hips until body forms a comfortable line.","Keep ribs down; pause briefly at the top without over-arching.","⌒","supine"],["Donkey kicks","2 × 10 / side","On all fours with knee bent, drive heel up and back, then lower.","Stop around torso level; keep pelvis square and avoid back arching.","↗","quadruped"],["Fire hydrants","2 × 10 / side","Lift one bent knee out to the side, then lower slowly.","Use a smaller range if your trunk rotates.","↗","quadruped"],["Banded clamshells","2 × 12 / side","With knees bent and feet together, open the top knee against light band tension.","Keep hips stacked; band is optional.","◒","side"]]},
+  {name:"Cooldown",items:[["Figure-four stretch","25 sec / side","Lie on your back, cross ankle over opposite thigh and draw legs toward you.","Use this instead of pigeon pose if kneeling is uncomfortable.","⌁","supine"],["Hip-flexor stretch","25 sec / side","Use a split stance, gently tuck pelvis and shift forward slightly.","Avoid pinching or arching your lower back.","→","standing"],["Standing quad stretch","25 sec / side","Hold ankle behind you and gently bring heel toward your seat.","Hold a wall for balance; don't force the stretch.","↗","standing"]]}
+ ]},
+ 3:{name:"Rest day",type:"rest",focus:"Recovery is part of the plan",sections:[]},
+ 5:{name:"Optional easy activity",type:"optional",focus:"Walk, gentle mobility or full rest",sections:[]},
+ 6:{name:"Rest day",type:"rest",focus:"Recovery is part of the plan",sections:[]}
+};
+const dowKey = d => (d.getDay()+6)%7;
+const dateKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const parseKey = k => {const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)};
+const today = new Date();
+let selectedDate = dateKey(today);
+let viewDate = new Date(today.getFullYear(),today.getMonth(),1);
+let moveTarget = null;
+let state = JSON.parse(localStorage.getItem('workoutogState')||'{"done":{},"moves":{},"checks":{},"notes":{}}');
+function save(){localStorage.setItem('workoutogState',JSON.stringify(state))}
+function planFor(key){
+ if(state.moves[key]) return plan[dowKey(parseKey(state.moves[key]))];
+ return plan[dowKey(parseKey(key))];
+}
+function effectivePlan(key){return state.moves[key] ? plan[dowKey(parseKey(state.moves[key]))] : plan[dowKey(parseKey(key))]}
+function dayLabel(d){return d.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})}
+function renderCalendar(){
+ const cal=document.getElementById('calendar');cal.innerHTML='';
+ document.getElementById('monthLabel').textContent=viewDate.toLocaleDateString(undefined,{month:'short',year:'numeric'});
+ const first=new Date(viewDate.getFullYear(),viewDate.getMonth(),1);
+ let offset=(first.getDay()+6)%7;
+ for(let i=0;i<offset;i++){const blank=document.createElement('div');cal.appendChild(blank)}
+ const days=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,0).getDate();
+ for(let n=1;n<=days;n++){
+  const d=new Date(viewDate.getFullYear(),viewDate.getMonth(),n),key=dateKey(d),p=effectivePlan(key);
+  const b=document.createElement('button');b.className='day '+(p.type==='workout'?'workout':p.type==='rest'?'rest':'optional')+(key===selectedDate?' selected':'')+(key===dateKey(today)?' today':'')+(state.done[key]?' done':'');
+  b.innerHTML=`<span class="num">${n}</span><i class="dot"></i>`;b.onclick=()=>{selectedDate=key;renderAll()};cal.appendChild(b);
+ }
+}
+function renderSummary(){
+ const p=effectivePlan(selectedDate),d=parseKey(selectedDate),sum=document.getElementById('daySummary');
+ const label=p.type==='workout'?'WORKOUT DAY':p.type==='rest'?'REST DAY':'OPTIONAL';
+ const moved=!!state.moves[selectedDate];
+ sum.innerHTML=`<div class="summary-top"><div><div class="eyebrow">${dayLabel(d)}</div><h4>${p.name}</h4><p>${p.focus}</p>${moved?'<p style="margin-top:6px">↪ Rescheduled session</p>':''}</div><span class="status">${state.done[selectedDate]?'COMPLETED':label}</span></div>
+ <div class="day-actions">${p.type==='workout'?`<button class="primary" id="jumpWorkout">Open workout</button><button class="secondary" id="moveWorkout">Reschedule</button>`:p.type==='optional'?`<button class="primary" id="jumpWorkout">View options</button><button class="secondary" id="moveWorkout">Reschedule</button>`:`<button class="secondary" id="moveWorkout">Reschedule a session here</button>`}</div>`;
+ const jump=document.getElementById('jumpWorkout');if(jump)jump.onclick=()=>document.getElementById('workoutTitle').scrollIntoView({behavior:'smooth',block:'start'});
+ document.getElementById('moveWorkout').onclick=()=>openMove(selectedDate);
+}
+function svgFor(kind){
+ const heads='<circle cx="25" cy="18" r="7" fill="#e7a9b7" stroke="#8e596a" stroke-width="2"/>';
+ const line=(x1,y1,x2,y2,extra='')=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#8e596a" stroke-width="7" stroke-linecap="round" ${extra}/>`;
+ let body='';
+ if(kind==='side'){body=`<g class="person">${heads}${line(28,29,56,39)}${line(56,39,79,43)}${line(55,39,36,53)}${line(36,53,17,53)}<g class="moving">${line(55,39,78,18)}${line(78,18,94,17)}</g></g><line x1="10" y1="62" x2="99" y2="62" stroke="#e8cbd2" stroke-width="2"/>`}
+ else if(kind==='quadruped'){body=`<g class="person">${heads}${line(31,28,50,39)}${line(50,39,70,42)}${line(33,31,22,46)}${line(22,46,15,62)}${line(50,39,45,54)}${line(45,54,44,64)}<g class="moving">${line(70,42,85,25)}${line(85,25,95,25)}</g></g><line x1="8" y1="67" x2="101" y2="67" stroke="#e8cbd2" stroke-width="2"/>`}
+ else if(kind==='supine'){body=`<g class="person"><circle cx="18" cy="51" r="7" fill="#e7a9b7" stroke="#8e596a" stroke-width="2"/>${line(26,51,52,51)}${line(52,51,66,61)}${line(66,61,83,61)}<g class="moving">${line(50,51,60,32)}${line(60,32,75,29)}</g></g><line x1="8" y1="68" x2="101" y2="68" stroke="#e8cbd2" stroke-width="2"/>`}
+ else if(kind==='standing'){body=`<g class="person">${heads}${line(25,27,25,47)}${line(25,32,12,42)}${line(25,32,38,42)}${line(25,47,15,65)}${line(25,47,37,65)}<g class="moving">${line(25,47,48,53)}${line(48,53,55,44)}</g></g><line x1="8" y1="68" x2="101" y2="68" stroke="#e8cbd2" stroke-width="2"/>`}
+ else if(kind==='seated'){body=`<g class="person">${heads}${line(25,27,35,47)}${line(35,47,55,47)}${line(35,47,28,62)}${line(55,47,73,47)}<g class="moving">${line(55,47,76,58)}${line(76,58,93,58)}</g></g><line x1="8" y1="68" x2="101" y2="68" stroke="#e8cbd2" stroke-width="2"/>`}
+ else {body=`<g class="person">${heads}${line(25,27,28,47)}${line(28,34,14,42)}${line(28,34,42,42)}${line(28,47,19,64)}<g class="moving">${line(28,47,46,57)}${line(46,57,61,55)}</g></g><line x1="8" y1="68" x2="101" y2="68" stroke="#e8cbd2" stroke-width="2"/>`}
+ return `<svg viewBox="0 0 110 80" role="img" aria-label="Simple looping movement illustration">${body}</svg>`;
+}
+function renderWorkout(){
+ const p=effectivePlan(selectedDate),container=document.getElementById('workoutContent');
+ document.getElementById('workoutTitle').textContent=p.type==='rest'?'Recovery day':p.type==='optional'?'Optional movement':'Your workout';
+ document.getElementById('workoutTag').textContent='WEEK 0';
+ if(p.type!=='workout'){
+  container.innerHTML=`<div class="empty"><div style="font-size:34px;margin-bottom:8px">${p.type==='rest'?'🌙':'☁️'}</div><strong>${p.name}</strong><p>${p.type==='rest'?'No workout required today. Rest supports recovery and progress.':'Choose an easy walk, relaxed swim, gentle mobility, or complete rest.'}</p><button class="secondary" id="showNextWorkout">Find next workout</button></div>`;
+  document.getElementById('showNextWorkout').onclick=()=>{let d=parseKey(selectedDate);for(let i=1;i<=7;i++){let next=new Date(d);next.setDate(d.getDate()+i);if(effectivePlan(dateKey(next)).type==='workout'){selectedDate=dateKey(next);viewDate=new Date(next.getFullYear(),next.getMonth(),1);renderAll();break}}};return;
+ }
+ let total=0,checked=0,html='';
+ p.sections.forEach((section,si)=>{
+  html+=`<div class="section-label">${section.name}</div><div class="workout-list">`;
+  section.items.forEach((it,ii)=>{
+   const id=`${selectedDate}_${si}_${ii}`,isDone=!!state.checks[id];if(section.name==='Workout'){total++;if(isDone)checked++}
+   html+=`<article class="exercise"><div class="exercise-main"><div class="ex-icon">${it[4]}</div><div class="ex-info"><strong>${it[0]}</strong><small>${it[1]}</small></div><button class="open-demo" data-demo="${id}">Demo</button>${section.name==='Workout'?`<input class="exercise-check" type="checkbox" aria-label="Mark ${it[0]} complete" data-check="${id}" ${isDone?'checked':''}>`:''}</div><div class="demo" id="demo_${id}"><div class="demo-layout"><div class="animation">${svgFor(it[5])}</div><div><h5>How to do it</h5><p>${it[2]}</p><p class="tip"><strong>Form tip:</strong> ${it[3]}</p></div></div></div></article>`;
+  });
+  html+='</div>';
+ });
+ const pct=total?Math.round(checked/total*100):0;
+ html+=`<div class="completion"><div><p><strong>Workout progress</strong> <span id="progressText">${checked}/${total} exercises</span></p><small>Tick each exercise when you're finished.</small><div class="progress"><span id="progressBar" style="width:${pct}%"></span></div></div><button class="primary" id="finishWorkout">${state.done[selectedDate]?'Completed ✓':'Finish'}</button></div>`;
+ container.innerHTML=html;
+ container.querySelectorAll('[data-demo]').forEach(btn=>btn.onclick=()=>{const panel=document.getElementById('demo_'+btn.dataset.demo);panel.classList.toggle('open');btn.textContent=panel.classList.contains('open')?'Hide':'Demo'});
+ container.querySelectorAll('[data-check]').forEach(cb=>cb.onchange=()=>{state.checks[cb.dataset.check]=cb.checked;save();renderAll()});
+ document.getElementById('finishWorkout').onclick=()=>{state.done[selectedDate]=!state.done[selectedDate];save();renderAll()};
+}
+function renderAll(){renderCalendar();renderSummary();renderWorkout()}
+function openMove(key){moveTarget=key;document.getElementById('newDate').value=key;document.getElementById('rescheduleModal').classList.add('show')}
+document.getElementById('cancelMove').onclick=()=>document.getElementById('rescheduleModal').classList.remove('show');
+document.getElementById('confirmMove').onclick=()=>{
+ const newKey=document.getElementById('newDate').value;if(!newKey)return;
+ if(newKey!==moveTarget){state.moves[newKey]=moveTarget;state.moves[moveTarget]=null;delete state.moves[moveTarget];state.done[newKey]=false;}
+ selectedDate=newKey;const d=parseKey(newKey);viewDate=new Date(d.getFullYear(),d.getMonth(),1);save();document.getElementById('rescheduleModal').classList.remove('show');renderAll();
+};
+document.getElementById('prevMonth').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar()};
+document.getElementById('nextMonth').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar()};
+document.getElementById('themeSelect').onchange=e=>{document.documentElement.dataset.theme=e.target.value==='pink'?'':e.target.value;localStorage.setItem('workoutogTheme',e.target.value)};
+const savedTheme=localStorage.getItem('workoutogTheme')||'pink';document.getElementById('themeSelect').value=savedTheme;document.documentElement.dataset.theme=savedTheme==='pink'?'':savedTheme;
+renderAll();
+</script>
+</body>
+</html>
